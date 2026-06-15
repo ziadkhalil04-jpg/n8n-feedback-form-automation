@@ -1,0 +1,247 @@
+{
+  "name": "feedback form",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "feedback",
+        "formDescription": "feedback from about proudct",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Name:",
+              "placeholder": "jak"
+            },
+            {
+              "fieldLabel": "Gmail:",
+              "fieldType": "email",
+              "placeholder": "ex@gmail.com",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Age:",
+              "fieldType": "number"
+            },
+            {
+              "fieldLabel": "Review:",
+              "fieldType": "textarea"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -544,
+        -16
+      ],
+      "id": "c2b0de1e-9e22-4277-9aab-22f970a94186",
+      "name": "On form submission",
+      "webhookId": "67cb4a8f-87e4-4506-97c9-e1dc60d29983"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json['Review:'] }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "Analyze the sentiment of this text.  Reply with only one word: 'Positive', or 'Negative'. --"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -288,
+        -16
+      ],
+      "id": "94e8c6b7-363f-4a74-8875-922e6466b77b",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -304,
+        192
+      ],
+      "id": "e0f43f67-cc69-4a8f-88f7-9ae4cda7019e",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "9ekQW5Hqqe7GAnpw",
+          "name": "Google Gemini(PaLM) Api account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('On form submission').item.json['Gmail:'] }}",
+        "subject": "=feedback responsible",
+        "emailType": "text",
+        "message": "=hi {{ $('On form submission').item.json['Name:'] }}\n\nthank you for feedback.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        -16
+      ],
+      "id": "b0bf51de-2c35-4ea2-9ab0-9e7e2e2e5dbe",
+      "name": "Send a message",
+      "webhookId": "dfac90fa-fa32-4af7-86b1-781d81f671b0",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "GRGhWSa10L7Teduy",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1OKwfBNCwKLo-cdfRTBML4HvA6-0UBGgJZyozfP-NumI",
+          "mode": "list",
+          "cachedResultName": "feedback form",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1OKwfBNCwKLo-cdfRTBML4HvA6-0UBGgJZyozfP-NumI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "الورقة1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1OKwfBNCwKLo-cdfRTBML4HvA6-0UBGgJZyozfP-NumI/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $('On form submission').item.json['Name:'] }}",
+            "Gmail": "={{ $('On form submission').item.json['Gmail:'] }}",
+            "Age": "={{ $('On form submission').item.json['Age:'] }}",
+            "Review": "={{ $('On form submission').item.json['Review:'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Gmail",
+              "displayName": "Gmail",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Age",
+              "displayName": "Age",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Review",
+              "displayName": "Review",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        176,
+        192
+      ],
+      "id": "4d696bd6-3c31-4ad1-8d77-b4365eb445b2",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "BtVs6fKYGgKvmgdX",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "0ba884c1-a693-467f-b622-f9f956d956a4",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "bfab51cabb276e6a380903b027bb7b1c91839ce7f7a13625578cbceec366ef1e"
+  },
+  "nodeGroups": [],
+  "id": "Lf47AULTu0Lt6RpN",
+  "tags": []
+}
